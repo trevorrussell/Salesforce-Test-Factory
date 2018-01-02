@@ -63,7 +63,8 @@ public class TestFactory {
 	public static SObject[] createSObjectList(Sobject sObj, Integer numberOfObjects, String defaultClassName) {
 		SObject[] sObjs = new SObject[] {};
 		SObject newObj;
-
+		Boolean nameIsAutoNumber;
+		
 		// Get one copy of the object
 		if (defaultClassName == null) {
 			newObj = createSObject(sObj);
@@ -75,11 +76,13 @@ public class TestFactory {
 		String nameField = nameFieldMap.get(String.valueOf(sObj.getSObjectType()));
 		if (nameField == null) {
 			nameField = 'Name';
+			nameIsAutoNumber = sObj.getSobjectType().getDescribe().fields.getMap().get('name').getDescribe().isAutoNumber();
 		}
 
 		// Clone the object the number of times requested. Increment the name field so each record is unique
 		for (Integer i = 0; i < numberOfObjects; i++) {
 			SObject clonedSObj = newObj.clone(false, true);
+			if (!nameIsAutoNumber)
 			clonedSObj.put(nameField, (String)clonedSObj.get(nameField) + ' ' + i);
 			sObjs.add(clonedSObj);
 		}
